@@ -25,3 +25,7 @@ https://s3.amazonaws.com/dl4j-distribution/GoogleNews-vectors-negative300.bin.gz
 ## Данни
 Данните за обучавне и проверка на мрежата могат да бъдат немерни тук:
 https://github.com/codenamewei/nlp-with-use-case/tree/master/1_SpamMailFiltering/src/main/resources/data
+
+## Визуализация на мрежата
+След стартиране на сървъра е възможно да се отвори страница, на която се визиализира състоянието на мрежата и приложението: 
+`http://localhost:9000/train/overveiw` 
