@@ -1,5 +1,6 @@
 package org.utp.modelling.spam;
 
+import org.deeplearning4j.api.storage.StatsStorage;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.nn.conf.GradientNormalization;
@@ -9,6 +10,7 @@ import org.deeplearning4j.nn.conf.layers.LSTM;
 import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
+import org.deeplearning4j.ui.api.UIServer;
 import org.deeplearning4j.ui.stats.StatsListener;
 import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
 import org.nd4j.linalg.activations.Activation;
@@ -24,11 +26,12 @@ import java.io.File;
 @Service
 public class SpamFilterService {
 
+  //This file should be downloaded and placed in the resources folder
   private static final String WORD_VECTOR_FILE = "GoogleNews-vectors-negative300.bin.gz";
   private static final int WORD_VECTORS_LENGTH = 300;
 
   private static final int SEED = 1234;
-  private static final int EPOCHS = 1;
+  private static final int EPOCHS = 3;
   private static final int CLASSES = 2;
   private static final int BATCH_SIZE = 64;
   private static final int TRUNCATED_LENGTH = 120;
@@ -49,7 +52,6 @@ public class SpamFilterService {
 
     this.network = createNetwork();
     network.init();
-    network.setListeners(new StatsListener(new InMemoryStatsStorage()));
     network.fit(trainIterator, EPOCHS);
 
     testIterator = new EmailDatasetIterator(
@@ -95,6 +97,12 @@ public class SpamFilterService {
             .build())
         .build();
 
-    return new MultiLayerNetwork(config);
+    MultiLayerNetwork network = new MultiLayerNetwork(config);
+    UIServer uiServer = UIServer.getInstance();
+    StatsStorage statsStorage = new InMemoryStatsStorage();
+    uiServer.attach(statsStorage);
+    network.setListeners(new StatsListener(statsStorage));
+
+    return network;
   }
 }
